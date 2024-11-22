@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Slot Status</title>
+    <script src="https://cdn.socket.io/4.5.3/socket.io.min.js"></script>
+</head>
+<body>
+     <h1>Parking Slot Status</h1>
+    <p id="status">Loading...</p>
+
+    <script>
+        // Connect to the Socket.IO server
+        const socket = io('http://localhost:5000');  // Connect to Flask-SocketIO server
+        const statusElement = document.getElementById('status');  // Get the element to display the status
+
+        // Listen for 'update' event from the server
+        socket.on('update', (data) => {
+            console.log('Received update:', data);  // Debugging log to see what data was received
+
+            if (data && data.slot_1) {
+                // Debug log for the current value of slot_1
+                console.log("Current slot status:", data.slot_1);
+
+                // Update the status text based on slot_1
+                if (data.slot_1 === "occupied") {
+                    statusElement.textContent = `Slot 1 is occupied`;
+                } else if (data.slot_1 === "available") {
+                    statusElement.textContent = `Slot 1 is available`;
+                }
+            } else {
+                statusElement.textContent = 'Unable to retrieve status';
+            }
+        });
+
+        // Handle connection error
+        socket.on('connect_error', (error) => {
+            console.error('Socket.IO connection error:', error);
+        });
+    </script>
+</body>
+</html>
